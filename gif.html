@@ -1,0 +1,45 @@
+<script>
+	var s = 'GIF89a' + // signature
+	'}\0}\0' +   // 0x007D 0x007D Viewport size
+	'\x80' +        // 0x80 Global palette, <CR> = 0, <S> = 0, color count = 2
+	'\0' +       // 0x00, background color index
+	'\0' +       // 0x00 pixel shape. Usually ignored
+	'~~~!!!' +   // Global palette
+
+	// Netscape extension: looping forever
+	'!\xFF\x0BNETSCAPE2.0\x03\x01\0\0\0';
+
+	for (var i=0; i < 42; i++) {
+
+		s +=
+		'!\xF9' +    // Extension code:
+		'\x04' +     // - byte length (fixed)
+		'm' +        // - ???? <00> <3> <1>
+		'\x04\0' +   // - 0x0004 frame delay: 4 / 100 sec
+		'\0' +       // - 0x00 transparent color
+		'\0';      // - end of extension
+
+		s +=
+		',' +        // 0x00 image separator
+		'\0\0\0\0' + // 0x00 0x00 top left
+		'}\0}\0' +   // 0x0021 0x0021 Frame size
+		'0' +        // 0x30 No global palette, <CR> = 3, <S> = 0, color count = 2
+		'\x07';      // 0x07 Code length - 1
+
+		for (var y = 0; y < 0x7D; y++) {
+			s += '~';    // 0x7E = 126 Upcoming chunk size
+			s += '\x80'; // 0x80 Clear codes
+
+			for (var x = 0; x < 0x7D; x++) {
+				s += String.fromCharCode(
+					Math.pow(x - 62, 2) + Math.pow(y - 62 + Math.sin(i / 10) * 40, 2) < Math.sin(i / 10) * 80 + 50
+				);
+			}
+		}
+
+		s+= '\0';
+	}
+	s+= ';';
+	document.write('<body background=data:image/gif;base64,' + btoa(s) + '>');
+
+</script>
